@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "922417222178",
+    "project_id": "trivokdb",
+    "storage_bucket": "trivokdb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922417222178:android:a1bafb2627cd8dd668b07b",
+        "android_client_info": {
+          "package_name": "com.example.trivok"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFAmYUbCHyvNpr1nxWY9eqoJEsIvaYHMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

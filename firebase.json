@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"trivokdb","appId":"1:922417222178:android:a1bafb2627cd8dd668b07b","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"trivokdb","configurations":{"android":"1:922417222178:android:a1bafb2627cd8dd668b07b","ios":"1:922417222178:ios:f5706f81263d3f1168b07b"}}}}}}
