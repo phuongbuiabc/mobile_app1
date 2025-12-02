@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # trivok
 
 A new Flutter project.
@@ -25,3 +26,6 @@ lib/
 │   └── client/         # Giao diện Khách (Home, Detail, 360View)
 ├── widgets/            # Các widget nhỏ dùng chung (Button, Input, Card)
 └── main.dart           # File chạy chính
+=======
+# mobile_app1
+>>>>>>> 72df4952c0acd0d4cd57c76aaac84d49d9f8a61a
