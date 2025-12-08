@@ -17,6 +17,10 @@ import 'booking_history_screen.dart';
 import 'favorites_screen.dart';
 import 'tour_detail_screen.dart';
 import 'booking_screen.dart';
+import '../profile/about_us_screen.dart';
+import '../profile/account_screen.dart';
+import '../profile/help_screen.dart';
+import '../profile/settings_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -25,7 +29,8 @@ class ClientHomeScreen extends StatefulWidget {
   State<ClientHomeScreen> createState() => _ClientHomeScreenState();
 }
 
-class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProviderStateMixin {
+class _ClientHomeScreenState extends State<ClientHomeScreen>
+    with TickerProviderStateMixin {
   final UserService _userService = UserService();
   final PageController _pageController = PageController();
   final TextEditingController _searchController = TextEditingController();
@@ -41,9 +46,18 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat(reverse: true);
-    _color1 = ColorTween(begin: const Color(0xFF006491), end: const Color(0xFF1CB5E0)).animate(_animController);
-    _color2 = ColorTween(begin: const Color(0xFF1CB5E0), end: const Color(0xFF000046)).animate(_animController);
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat(reverse: true);
+    _color1 = ColorTween(
+      begin: const Color(0xFF006491),
+      end: const Color(0xFF1CB5E0),
+    ).animate(_animController);
+    _color2 = ColorTween(
+      begin: const Color(0xFF1CB5E0),
+      end: const Color(0xFF000046),
+    ).animate(_animController);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TourProvider>(context, listen: false).fetchTours();
@@ -60,7 +74,11 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
 
   List<TourModel> _filterTours(List<TourModel> tours) {
     if (_searchKeyword.isEmpty) return tours;
-    return tours.where((t) => t.title.toLowerCase().contains(_searchKeyword.toLowerCase())).toList();
+    return tours
+        .where(
+          (t) => t.title.toLowerCase().contains(_searchKeyword.toLowerCase()),
+        )
+        .toList();
   }
 
   @override
@@ -83,8 +101,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkTheme ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.85),
-              border: Border(top: BorderSide(color: isDarkTheme ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.2), width: 0.5)),
+              color: isDarkTheme
+                  ? Colors.black.withOpacity(0.6)
+                  : Colors.white.withOpacity(0.85),
+              border: Border(
+                top: BorderSide(
+                  color: isDarkTheme
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.grey.withOpacity(0.2),
+                  width: 0.5,
+                ),
+              ),
             ),
             child: BottomNavigationBar(
               currentIndex: _currentIndex,
@@ -95,13 +122,28 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
               selectedItemColor: isDarkTheme ? Colors.white : Palette.primary,
               unselectedItemColor: isDarkTheme ? Colors.white54 : Colors.grey,
               showUnselectedLabels: true,
-              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              selectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
               unselectedLabelStyle: const TextStyle(fontSize: 11),
               items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Trang chủ"),
-                BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Yêu thích"),
-                BottomNavigationBarItem(icon: Icon(Icons.confirmation_number), label: "Vé của tôi"),
-                BottomNavigationBarItem(icon: Icon(Icons.person), label: "Cá nhân"),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.explore),
+                  label: "Trang chủ",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.favorite),
+                  label: "Yêu thích",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.confirmation_number),
+                  label: "Vé của tôi",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: "Cá nhân",
+                ),
               ],
             ),
           ),
@@ -126,7 +168,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                       colors: [_color1.value!, _color2.value!],
                     ),
                   ),
@@ -145,14 +188,35 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.travel_explore, color: _isReelMode ? Colors.white : Palette.primary, size: 28),
+                                  Icon(
+                                    Icons.travel_explore,
+                                    color: _isReelMode
+                                        ? Colors.white
+                                        : Palette.primary,
+                                    size: 28,
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text("Trivok", style: GoogleFonts.nunito(color: textColor, fontWeight: FontWeight.bold, fontSize: 24)),
+                                  Text(
+                                    "Trivok",
+                                    style: GoogleFonts.nunito(
+                                      color: textColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 24,
+                                    ),
+                                  ),
                                 ],
                               ),
                               IconButton(
-                                icon: Icon(_isReelMode ? Icons.grid_view : Icons.view_stream, color: _isReelMode ? Colors.white : Palette.primary),
-                                onPressed: () => setState(() => _isReelMode = !_isReelMode),
+                                icon: Icon(
+                                  _isReelMode
+                                      ? Icons.grid_view
+                                      : Icons.view_stream,
+                                  color: _isReelMode
+                                      ? Colors.white
+                                      : Palette.primary,
+                                ),
+                                onPressed: () =>
+                                    setState(() => _isReelMode = !_isReelMode),
                               ),
                             ],
                           ),
@@ -160,24 +224,63 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
                           Container(
                             height: 45,
                             decoration: BoxDecoration(
-                              color: _isReelMode ? Colors.white.withOpacity(0.2) : Colors.white,
+                              color: _isReelMode
+                                  ? Colors.white.withOpacity(0.2)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: _isReelMode ? Colors.white30 : Colors.grey.shade300),
-                              boxShadow: _isReelMode ? [] : [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))],
+                              border: Border.all(
+                                color: _isReelMode
+                                    ? Colors.white30
+                                    : Colors.grey.shade300,
+                              ),
+                              boxShadow: _isReelMode
+                                  ? []
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                             ),
                             child: TextField(
                               controller: _searchController,
                               style: TextStyle(color: textColor),
-                              onChanged: (value) => setState(() => _searchKeyword = value),
+                              onChanged: (value) =>
+                                  setState(() => _searchKeyword = value),
                               decoration: InputDecoration(
                                 hintText: "Tìm kiếm địa điểm...",
-                                hintStyle: TextStyle(color: _isReelMode ? Colors.white60 : Colors.grey),
-                                prefixIcon: Icon(Icons.search, color: _isReelMode ? Colors.white70 : Colors.grey),
+                                hintStyle: TextStyle(
+                                  color: _isReelMode
+                                      ? Colors.white60
+                                      : Colors.grey,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: _isReelMode
+                                      ? Colors.white70
+                                      : Colors.grey,
+                                ),
                                 suffixIcon: _searchKeyword.isNotEmpty
-                                    ? IconButton(icon: Icon(Icons.clear, color: _isReelMode ? Colors.white70 : Colors.grey, size: 18), onPressed: () { _searchController.clear(); setState(() => _searchKeyword = ""); })
+                                    ? IconButton(
+                                        icon: Icon(
+                                          Icons.clear,
+                                          color: _isReelMode
+                                              ? Colors.white70
+                                              : Colors.grey,
+                                          size: 18,
+                                        ),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          setState(() => _searchKeyword = "");
+                                        },
+                                      )
                                     : null,
                                 border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
                               ),
                             ),
                           ),
@@ -189,13 +292,28 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
                       child: Consumer<TourProvider>(
                         builder: (context, tourProvider, child) {
                           if (tourProvider.isLoading) {
-                            return Center(child: CircularProgressIndicator(color: _isReelMode ? Colors.white : Palette.primary));
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: _isReelMode
+                                    ? Colors.white
+                                    : Palette.primary,
+                              ),
+                            );
                           }
 
-                          final filteredTours = _filterTours(tourProvider.tours);
+                          final filteredTours = _filterTours(
+                            tourProvider.tours,
+                          );
 
                           if (filteredTours.isEmpty) {
-                            return Center(child: Text(_searchKeyword.isNotEmpty ? "Không tìm thấy '$_searchKeyword'" : "Chưa có địa điểm nào!", style: TextStyle(color: textColor)));
+                            return Center(
+                              child: Text(
+                                _searchKeyword.isNotEmpty
+                                    ? "Không tìm thấy '$_searchKeyword'"
+                                    : "Chưa có địa điểm nào!",
+                                style: TextStyle(color: textColor),
+                              ),
+                            );
                           }
 
                           return _isReelMode
@@ -209,7 +327,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
               ),
 
               Positioned(
-                bottom: 80, left: 0, right: 0,
+                bottom: 80,
+                left: 0,
+                right: 0,
                 child: const ComparisonBar(),
               ),
             ],
@@ -232,8 +352,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
             _userService.toggleFavorite(tours[index].id);
             // Thông báo sẽ được xử lý visual trong ReelItem
           },
-          onShare: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Đã sao chép liên kết!"))),
-          onDetail: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TourDetailScreen(tour: tours[index]))),
+          onShare: () => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Đã sao chép liên kết!")),
+          ),
+          onDetail: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TourDetailScreen(tour: tours[index]),
+            ),
+          ),
         );
       },
     );
@@ -242,32 +369,88 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
   Widget _buildGridView(List<TourModel> tours) {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 120),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.7, crossAxisSpacing: 16, mainAxisSpacing: 16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
       itemCount: tours.length,
       itemBuilder: (context, index) {
         final tour = tours[index];
         return GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TourDetailScreen(tour: tour))),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => TourDetailScreen(tour: tour)),
+          ),
           child: Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 3))]),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                    child: CachedNetworkImage(imageUrl: tour.imageUrl, width: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => Container(color: Colors.grey[200])),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(15),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: tour.imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          Container(color: Colors.grey[200]),
+                    ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(tour.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    const SizedBox(height: 4),
-                    Row(children: [const Icon(Icons.star, size: 14, color: Colors.amber), Text(" ${tour.rate}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey))]),
-                    const SizedBox(height: 4),
-                    Text("${tour.price.toStringAsFixed(0)} đ", style: const TextStyle(color: Palette.primary, fontWeight: FontWeight.bold, fontSize: 13)),
-                  ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tour.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, size: 14, color: Colors.amber),
+                          Text(
+                            " ${tour.rate}",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "${tour.price.toStringAsFixed(0)} đ",
+                        style: const TextStyle(
+                          color: Palette.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -278,39 +461,173 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> with TickerProvider
   }
 
   Widget _buildProfileTab() {
-    return Scaffold(
-      backgroundColor: Palette.background,
-      body: Center(
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // Trường hợp hiếm gặp vì đã có AuthGate, nhưng để an toàn
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(radius: 50, backgroundColor: Palette.primary, child: Icon(Icons.person, size: 50, color: Colors.white)),
-            const SizedBox(height: 20),
-            const Text("Xin chào, Khách hàng!", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
-            const Text("Thành viên hạng Vàng", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 40),
-            _buildProfileItem(Icons.settings, "Cài đặt"),
-            _buildProfileItem(Icons.help_outline, "Trợ giúp & Hỗ trợ"),
-            _buildProfileItem(Icons.info_outline, "Về ứng dụng Trivok"),
-            const SizedBox(height: 30),
-            ElevatedButton.icon(
+            const Text("Vui lòng đăng nhập để xem thông tin"),
+            ElevatedButton(
               onPressed: () => AuthService().signOut(),
-              icon: const Icon(Icons.logout, color: Colors.white), label: const Text("Đăng xuất", style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12)),
+              child: const Text("Tới trang đăng nhập"),
             ),
           ],
         ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Palette.background,
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return const Center(
+              child: Text("Không thể tải dữ liệu người dùng."),
+            );
+          }
+
+          final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+          final displayName =
+              userData['fullName'] ?? user.displayName ?? "Khách hàng";
+          final avatarUrl = userData['avatar'] ?? user.photoURL;
+
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Palette.primary.withOpacity(0.2),
+                  backgroundImage: avatarUrl != null
+                      ? CachedNetworkImageProvider(avatarUrl)
+                      : null,
+                  child: avatarUrl == null
+                      ? Text(
+                          displayName.isNotEmpty
+                              ? displayName[0].toUpperCase()
+                              : 'K',
+                          style: const TextStyle(
+                            fontSize: 40,
+                            color: Palette.primary,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "Xin chào, $displayName!",
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  "Thành viên hạng Vàng",
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                _buildProfileItem(
+                  Icons.account_circle_outlined,
+                  "Tài khoản",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AccountScreen()),
+                    );
+                  },
+                ),
+                _buildProfileItem(
+                  Icons.settings,
+                  "Cài đặt",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    );
+                  },
+                ),
+                _buildProfileItem(
+                  Icons.help_outline,
+                  "Trợ giúp & Hỗ trợ",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HelpScreen()),
+                    );
+                  },
+                ),
+                _buildProfileItem(
+                  Icons.info_outline,
+                  "Về ứng dụng Trivok",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutUsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton.icon(
+                  onPressed: () => AuthService().signOut(),
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text(
+                    "Đăng xuất",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildProfileItem(IconData icon, String text) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 5)]),
-      child: Row(children: [Icon(icon, color: Colors.grey), const SizedBox(width: 15), Text(text, style: const TextStyle(fontSize: 16)), const Spacer(), const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey)]),
+  Widget _buildProfileItem(IconData icon, String text, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 5),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.grey),
+            const SizedBox(width: 15),
+            Text(text, style: const TextStyle(fontSize: 16)),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -334,7 +651,8 @@ class ReelItem extends StatefulWidget {
   State<ReelItem> createState() => _ReelItemState();
 }
 
-class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin {
+class _ReelItemState extends State<ReelItem>
+    with SingleTickerProviderStateMixin {
   late PageController _imagePageController;
   Timer? _timer;
   int _activePage = 0;
@@ -351,12 +669,12 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
 
     // Animation Controller cho tim bay
     _heartAnimController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 400)
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
     );
 
     _heartScaleAnimation = Tween<double>(begin: 0.0, end: 1.2).animate(
-        CurvedAnimation(parent: _heartAnimController, curve: Curves.elasticOut)
+      CurvedAnimation(parent: _heartAnimController, curve: Curves.elasticOut),
     );
 
     _heartAnimController.addStatusListener((status) {
@@ -387,7 +705,9 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
         }
         _imagePageController.animateToPage(
           nextPage,
-          duration: const Duration(milliseconds: 800), // Thời gian lướt mượt hơn
+          duration: const Duration(
+            milliseconds: 800,
+          ), // Thời gian lướt mượt hơn
           curve: Curves.fastOutSlowIn,
         );
       }
@@ -473,7 +793,9 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
           Positioned.fill(
             child: PageView.builder(
               controller: _imagePageController,
-              itemCount: widget.tour.images.isNotEmpty ? widget.tour.images.length : 1,
+              itemCount: widget.tour.images.isNotEmpty
+                  ? widget.tour.images.length
+                  : 1,
               onPageChanged: (page) {
                 setState(() {
                   _activePage = page;
@@ -487,8 +809,12 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
                 return CachedNetworkImage(
                   imageUrl: imgUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(color: Colors.grey[900]),
-                  errorWidget: (context, url, error) => Container(color: Colors.grey[900], child: const Icon(Icons.broken_image, color: Colors.white)),
+                  placeholder: (context, url) =>
+                      Container(color: Colors.grey[900]),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[900],
+                    child: const Icon(Icons.broken_image, color: Colors.white),
+                  ),
                 );
               },
             ),
@@ -499,8 +825,14 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  colors: [Colors.black.withOpacity(0.3), Colors.transparent, Colors.transparent, Colors.black.withOpacity(0.8)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.3),
+                    Colors.transparent,
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.8),
+                  ],
                   stops: const [0.0, 0.2, 0.6, 1.0],
                 ),
               ),
@@ -516,7 +848,13 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
                   Icons.favorite,
                   color: Colors.white,
                   size: 100, // Tim to giữa màn hình
-                  shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))],
+                  shadows: [
+                    Shadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -533,44 +871,75 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildGlassArrow(
-                            Icons.arrow_back_ios,
-                                () {
-                              int prevPage = _activePage == 0 ? widget.tour.images.length - 1 : _activePage - 1;
-                              _imagePageController.animateToPage(prevPage, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                            }
-                        ),
-                        _buildGlassArrow(
-                            Icons.arrow_forward_ios,
-                                () {
-                              int nextPage = _activePage == widget.tour.images.length - 1 ? 0 : _activePage + 1;
-                              _imagePageController.animateToPage(nextPage, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                            }
-                        ),
+                        _buildGlassArrow(Icons.arrow_back_ios, () {
+                          int prevPage = _activePage == 0
+                              ? widget.tour.images.length - 1
+                              : _activePage - 1;
+                          _imagePageController.animateToPage(
+                            prevPage,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }),
+                        _buildGlassArrow(Icons.arrow_forward_ios, () {
+                          int nextPage =
+                              _activePage == widget.tour.images.length - 1
+                              ? 0
+                              : _activePage + 1;
+                          _imagePageController.animateToPage(
+                            nextPage,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }),
                       ],
                     ),
                   ),
 
                   // Dots Indicator (Tâm trên)
-                  Positioned(
-                    top: 80,
-                    child: _buildDotsIndicator(),
-                  ),
+                  Positioned(top: 80, child: _buildDotsIndicator()),
                 ],
               ),
             ),
 
           // 5. THÔNG TIN TOUR
           Positioned(
-            bottom: 100, left: 20, right: 80,
+            bottom: 100,
+            left: 20,
+            right: 80,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: Palette.accent, borderRadius: BorderRadius.circular(20)), child: const Text("Trending 🔥", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Palette.accent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    "Trending 🔥",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 10),
 
                 // Tên Tour
-                Text(widget.tour.title, style: GoogleFonts.nunito(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, height: 1.1)),
+                Text(
+                  widget.tour.title,
+                  style: GoogleFonts.nunito(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    height: 1.1,
+                  ),
+                ),
                 const SizedBox(height: 8),
 
                 // Rating
@@ -578,36 +947,66 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
                   children: [
                     const Icon(Icons.star, color: Colors.amber, size: 20),
                     const SizedBox(width: 5),
-                    Text("${widget.tour.rate}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      "${widget.tour.rate}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(width: 5),
-                    const Text("(1.2k đánh giá)", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    const Text(
+                      "(1.2k đánh giá)",
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
 
                 // Giá tiền
-                Text("${widget.tour.price.toStringAsFixed(0)} đ", style: const TextStyle(color: Colors.greenAccent, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(
+                  "${widget.tour.price.toStringAsFixed(0)} đ",
+                  style: const TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
                 const SizedBox(height: 15),
                 // Nút Chi tiết
                 ElevatedButton.icon(
                   onPressed: widget.onDetail,
-                  icon: const Icon(Icons.arrow_forward, size: 18), label: const Text("Chi tiết"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.2), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                )
+                  icon: const Icon(Icons.arrow_forward, size: 18),
+                  label: const Text("Chi tiết"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
 
           // 6. CỘT BÊN PHẢI (SIDE ACTIONS)
           Positioned(
-            bottom: 100, right: 15,
+            bottom: 100,
+            right: 15,
             child: Column(
               children: [
                 // NÚT THÍCH VỚI STREAM (Tự đổi màu đỏ)
                 _buildFavoriteButton(),
                 const SizedBox(height: 20),
-                _buildSideAction(Icons.share, "Chia sẻ", Colors.white, widget.onShare),
+                _buildSideAction(
+                  Icons.share,
+                  "Chia sẻ",
+                  Colors.white,
+                  widget.onShare,
+                ),
               ],
             ),
           ),
@@ -622,12 +1021,20 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
 
     // Nếu chưa đăng nhập thì hiện tim trắng tĩnh
     if (userId == null) {
-      return _buildSideAction(Icons.favorite, "Thích", Colors.white, widget.onLike);
+      return _buildSideAction(
+        Icons.favorite,
+        "Thích",
+        Colors.white,
+        widget.onLike,
+      );
     }
 
     // Lắng nghe realtime từ Firebase để biết tour này có được like không
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(userId).snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .snapshots(),
       builder: (context, snapshot) {
         bool isLiked = false;
         if (snapshot.hasData && snapshot.data!.exists) {
@@ -637,27 +1044,44 @@ class _ReelItemState extends State<ReelItem> with SingleTickerProviderStateMixin
         }
 
         return _buildSideAction(
-            Icons.favorite,
-            "Thích",
-            isLiked ? Colors.redAccent : Colors.white, // Đổi màu nếu đã thích
-            widget.onLike
+          Icons.favorite,
+          "Thích",
+          isLiked ? Colors.redAccent : Colors.white, // Đổi màu nếu đã thích
+          widget.onLike,
         );
       },
     );
   }
 
-  Widget _buildSideAction(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _buildSideAction(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(children: [
-        Container(
+      child: Column(
+        children: [
+          Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 30) // Màu icon động
-        ),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-      ]),
+            decoration: BoxDecoration(
+              color: Colors.black45,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 30), // Màu icon động
+          ),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
