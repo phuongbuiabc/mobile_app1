@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/palette.dart';
+import 'package:intl/intl.dart';
+import './change_userInfor_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -53,6 +55,14 @@ class _AccountScreenState extends State<AccountScreen> {
     final String email =
         _userData?['email'] ?? _currentUser?.email ?? 'Không có email';
     final String? avatarUrl = _userData?['avatar'] ?? _currentUser?.photoURL;
+    final String createAt;
+    if (_userData?['createdAt'] != null) {
+      final timestamp = _userData!['createdAt'] as Timestamp;
+      final dateTime = timestamp.toDate();
+      createAt = DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
+    } else {
+      createAt = 'Không có ngày tạo';
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -101,12 +111,24 @@ class _AccountScreenState extends State<AccountScreen> {
                   label: 'Số điện thoại',
                   value: 'Chưa cập nhật', // Giả sử chưa có
                 ),
+                const Divider(height: 30),
+                _buildInfoTile(
+                  icon: Icons.done_all_sharp,
+                  label: 'Ngày tạo',
+                  value: createAt, // Giả sử chưa có
+                ),
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Chức năng đang phát triển!"),
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(
+                    //     content: Text("Chức năng đang phát triển!"),
+                    //   ),
+                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ChangeUserInfoScreen(),
                       ),
                     );
                   },
