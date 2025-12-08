@@ -6,32 +6,32 @@ class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 1. THÊM Tour mới (Admin)
-  // Đã cập nhật: Nhận URL trực tiếp, thêm field duration/description cho tính năng So sánh
+  // 1. THÊM Tour mới (Admin) - Cập nhật Schema
   Future<String?> addTour({
-    required String name,
+    required String title,
     required double price,
-    required String imageUrl,
-    required String duration,
+    required List<String> images,
     required String description,
+    required String destination,
+    required List<String> itinerary,
+    double rate = 5.0,
+    bool isActive = true,
   }) async {
     try {
-      if (imageUrl.isEmpty || !Uri.parse(imageUrl).isAbsolute) {
-        return "URL ảnh chính không hợp lệ. Vui lòng dán link ảnh công khai.";
+      if (images.isEmpty) {
+        return "Vui lòng cung cấp ít nhất 1 ảnh.";
       }
 
       await _firestore.collection('tours').add({
-        'name': name,
+        'title': title,
         'price': price,
-        'image': imageUrl,
-        'duration': duration,
+        'images': images, // Lưu mảng ảnh
         'description': description,
-
-        // Các trường mặc định
-        'location': 'Việt Nam',
-        'rating': 5.0,
-        'isFeatured': false,
-        'createdAt': Timestamp.now(),
+        'destination': destination,
+        'itinerary': itinerary, // Lưu mảng lịch trình
+        'rate': rate,
+        'is_active': isActive,
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       return null; // Thành công
@@ -40,19 +40,16 @@ class FirestoreService {
     }
   }
 
-  // 2. ĐẶT VÉ (Client)
-  // Hàm này nhận đối tượng BookingModel và lưu lên Firestore
+  // 2. ĐẶT VÉ (Client) - Giữ nguyên
   Future<String?> placeBooking(BookingModel booking) async {
     try {
-      // Lưu đơn hàng vào collection 'bookings'
       DocumentReference ref = await _firestore.collection('bookings').add(booking.toJson());
-      return ref.id; // Trả về ID đơn hàng (để tạo QR Code)
+      return ref.id;
     } catch (e) {
       print("Lỗi đặt vé: $e");
       return null;
     }
   }
 
-  // 3. Tiện ích: Lấy User ID hiện tại
   String? get currentUserId => _auth.currentUser?.uid;
 }
