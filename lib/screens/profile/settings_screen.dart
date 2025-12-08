@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../config/palette.dart';
+import './terms_of_service_screen.dart';
 import 'change_password_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -74,12 +76,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildNavigationTile(
             icon: Icons.description_outlined,
             title: 'Điều khoản dịch vụ',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
+              );
+            },
           ),
           _buildNavigationTile(
             icon: Icons.shield_outlined,
             title: 'Chính sách bảo mật',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+              );
+            },
           ),
         ],
       ),
