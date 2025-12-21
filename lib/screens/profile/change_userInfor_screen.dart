@@ -14,6 +14,7 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   bool _isLoading = false;
+  Map<String, dynamic>? _userData;
 
   // Define fields here so it's easy to add more later.
   final List<_FieldDef> _fields = [
@@ -22,15 +23,48 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
       label: 'Tên hiển thị',
       hint: 'Nhập tên của bạn',
     ),
+    _FieldDef(
+      key: 'phone',
+      label: 'Số điện thoại',
+      hint: 'Nhập số điện thoại của bạn',
+    ),
   ];
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
-    for (final f in _fields) {
-      final initial = _getInitialValueForField(user, f.key);
-      _controllers[f.key] = TextEditingController(text: initial);
+    if (user == null) {
+      for (final f in _fields) {
+        _controllers[f.key] = TextEditingController();
+      }
+      return;
+    }
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      
+      if (doc.exists) {
+        _userData = doc.data() as Map<String, dynamic>;
+      }
+
+      for (final f in _fields) {
+        final initial = _getInitialValueForField(user, f.key);
+        _controllers[f.key] = TextEditingController(text: initial);
+      }
+    } catch (e) {
+      // If error loading from Firestore, still initialize with Auth data
+      for (final f in _fields) {
+        final initial = _getInitialValueForField(user, f.key);
+        _controllers[f.key] = TextEditingController(text: initial);
+      }
     }
   }
 
@@ -39,6 +73,19 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
     switch (key) {
       case 'displayName':
         return user.displayName ?? '';
+      case 'phone':
+        // Lấy từ Firestore trước, nếu không có thì lấy từ Firebase Auth
+        final phoneFromFirestore = _userData?['phone'];
+        if (phoneFromFirestore != null && phoneFromFirestore.toString().isNotEmpty) {
+          return phoneFromFirestore.toString();
+        }
+        // Nếu không có trong Firestore, thử lấy từ Firebase Auth
+        final phoneFromAuth = user.phoneNumber;
+        if (phoneFromAuth != null && phoneFromAuth.isNotEmpty) {
+          return phoneFromAuth;
+        }
+        // Nếu không có thì trả về empty string (không hiển thị giá trị)
+        return '';
       default:
         return '';
     }
@@ -67,13 +114,24 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
     try {
       final updates = <String, dynamic>{};
 
-      // Currently we only handle displayName, but this scales easily.
+      // Handle displayName
       final displayName = _controllers['displayName']!.text.trim();
       if (displayName.isNotEmpty && displayName != user.displayName) {
         // Update Firebase Auth profile
         await user.updateDisplayName(displayName);
         // Store the user's full name in Firestore under the `fullName` field.
         updates['fullName'] = displayName;
+      }
+
+      // Handle phone number
+      final phone = _controllers['phone']!.text.trim();
+      final currentPhone = _userData?['phone']?.toString() ?? user.phoneNumber ?? '';
+      if (phone.isNotEmpty && phone != currentPhone) {
+        // Store phone in Firestore (we don't update Firebase Auth phoneNumber as it requires verification)
+        updates['phone'] = phone;
+      } else if (phone.isEmpty && currentPhone.isNotEmpty) {
+        // If user clears the phone field, remove it from Firestore
+        updates['phone'] = FieldValue.delete();
       }
 
       // Persist to Firestore users collection (merge so we don't overwrite other fields)
@@ -139,6 +197,14 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
                       if (value == null || value.trim().isEmpty)
                         return 'Vui lòng nhập tên.';
                       if (value.trim().length < 2) return 'Tên quá ngắn.';
+                    } else if (f.key == 'phone') {
+                      // Phone is optional, but if provided, validate format
+                      if (value != null && value.trim().isNotEmpty) {
+                        final phoneRegex = RegExp(r'^[0-9]{10,11}$');
+                        if (!phoneRegex.hasMatch(value.trim())) {
+                          return 'Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số.';
+                        }
+                      }
                     }
                     return null;
                   },

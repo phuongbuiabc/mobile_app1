@@ -3,6 +3,8 @@ import '../../services/auth_service.dart';
 import '../../config/palette.dart';
 import 'add_tour_screen.dart';
 import 'admin_booking_screen.dart'; // Import màn hình quản lý đơn hàng
+import 'admin_tourList_screen.dart'; // Import màn hình danh sách tour
+import 'admin_userList_screen.dart'; // Import màn hình danh sách người dùng
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -69,13 +71,22 @@ class AdminDashboardScreen extends StatelessWidget {
                     () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminBookingScreen()))
             ),
 
-            // Các nút Placeholder (Chưa kích hoạt)
-            _buildAdminTile(context, "Danh sách Tour", Icons.list, Palette.primary, () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tính năng đang phát triển")));
-            }),
-            _buildAdminTile(context, "Quản lý Người dùng", Icons.group, Palette.primary, () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tính năng đang phát triển")));
-            }),
+            // Nút Danh sách Tour (Đã kích hoạt)
+            _buildAdminTile(
+                context,
+                "Danh sách Tour",
+                Icons.list,
+                Palette.primary,
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminTourListScreen()))
+            ),
+            // Nút Quản lý Người dùng (Đã kích hoạt)
+            _buildAdminTile(
+                context,
+                "Quản lý Người dùng",
+                Icons.group,
+                Palette.primary,
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminUserListScreen()))
+            ),
           ],
         ),
       ),
