@@ -1,4 +1,3 @@
-import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../config/palette.dart';
@@ -17,15 +16,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLogin = true;
   bool isLoading = false;
 
-  // Controller
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
 
   final AuthService _authService = AuthService();
-  final EmailOTP _emailOTP = EmailOTP();
+  // Đã bỏ EmailOTP vì không dùng nữa
 
-  // 1. Hàm xử lý logic CHÍNH (Đăng nhập hoặc Gửi OTP)
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => isLoading = true);
@@ -33,57 +30,50 @@ class _LoginScreenState extends State<LoginScreen> {
     String? error;
 
     if (isLogin) {
-      // --- LOGIC ĐĂNG NHẬP ---
+      // --- LOGIC ĐĂNG NHẬP (Giữ nguyên) ---
       error = await _authService.signIn(
         email: _emailController.text.trim(),
         password: _passController.text.trim(),
       );
     } else {
-      // --- LOGIC ĐĂNG KÝ (GỬI OTP) ---
+      // --- LOGIC ĐĂNG KÝ GIẢ LẬP ---
 
-      // Cấu hình OTP
-      _emailOTP.setConfig(
-          appEmail: "support@trivok.com",
-          appName: "Trivok Travel",
-          userEmail: _emailController.text.trim(),
-          otpLength: 6,
-          otpType: OTPType.digitsOnly
-      );
+      // Giả vờ đợi 1.5 giây để giống như đang gửi mail thật
+      await Future.delayed(const Duration(milliseconds: 1500));
 
-      // Gửi OTP
-      bool result = await _emailOTP.sendOTP();
+      // Thông báo cho người dùng biết mã
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mã OTP là 123456")));
 
-      if (result) {
-        // Gửi thành công -> Chuyển sang màn hình nhập OTP
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("OTP đã gửi! Kiểm tra mail nhé.")));
+      // Chuyển sang màn hình nhập OTP (Không cần truyền object myAuth nữa)
+      if (mounted) {
         Navigator.push(context, MaterialPageRoute(builder: (_) => OtpScreen(
           email: _emailController.text.trim(),
           password: _passController.text.trim(),
           name: _nameController.text.trim(),
-          myAuth: _emailOTP,
         )));
-      } else {
-        error = "Lỗi gửi OTP. Kiểm tra lại email!";
       }
     }
 
-    setState(() => isLoading = false);
-
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error), backgroundColor: Colors.red));
+    // Nếu là đăng nhập và có lỗi thì hiện lỗi, nếu không có lỗi (null) thì AuthGate tự chuyển trang
+    if (isLogin) {
+      setState(() => isLoading = false);
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error), backgroundColor: Colors.red));
+      }
+    } else {
+      // Nếu là đăng ký thì đã chuyển trang rồi, chỉ tắt loading
+      setState(() => isLoading = false);
     }
   }
 
-  // 2. Hàm Quên mật khẩu
+  // Các hàm khác giữ nguyên
   void _forgotPassword() async {
     if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Vui lòng nhập Email hợp lệ trước!")));
       return;
     }
-
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Đang gửi link reset...")));
     String? error = await _authService.sendPasswordResetEmail(_emailController.text.trim());
-
     if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Đã gửi link reset pass vào email!")));
     } else {
@@ -91,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // 3. Hàm Login Google
   void _googleSignIn() async {
     setState(() => isLoading = true);
     String? error = await _authService.signInWithGoogle();
@@ -119,17 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(isLogin ? "Chào mừng trở lại!" : "Tạo tài khoản mới", style: GoogleFonts.nunito(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 40),
 
-                // Ô nhập liệu Tên (chỉ hiện khi Đăng ký)
                 if (!isLogin) ...[
                   _buildTextField(_nameController, "Họ và tên", Icons.person, isName: true),
                   const SizedBox(height: 16),
                 ],
-                // Ô Email và Mật khẩu
                 _buildTextField(_emailController, "Email", Icons.email),
                 const SizedBox(height: 16),
                 _buildTextField(_passController, "Mật khẩu", Icons.lock, isPassword: true),
 
-                // Nút Quên mật khẩu (Chỉ hiện khi Đăng nhập)
                 if (isLogin)
                   Align(
                     alignment: Alignment.centerRight,
@@ -141,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 10),
 
-                // Nút Login/Register Chính
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -161,7 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Row(children: [Expanded(child: Divider()), Padding(padding: EdgeInsets.all(8), child: Text("HOẶC")), Expanded(child: Divider())]),
                 const SizedBox(height: 20),
 
-                // Nút Google Sign In
                 OutlinedButton.icon(
                   onPressed: isLoading ? null : _googleSignIn,
                   icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.red),
@@ -173,10 +157,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 const SizedBox(height: 20),
-                // Nút chuyển đổi Login/Register
                 TextButton(
                   onPressed: () {
-                    // Xóa dữ liệu cũ khi chuyển mode
                     _emailController.clear();
                     _passController.clear();
                     _nameController.clear();
@@ -195,7 +177,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Widget con để vẽ ô nhập liệu
   Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool isPassword = false, bool isName = false}) {
     return TextFormField(
       controller: controller,
