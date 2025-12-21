@@ -51,12 +51,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen>
       duration: const Duration(seconds: 10),
     )..repeat(reverse: true);
     _color1 = ColorTween(
-      begin: const Color(0xFF006491),
-      end: const Color(0xFF1CB5E0),
+      begin: const Color(0xFF029DCD),
+      end: const Color(0xFFA80404),
     ).animate(_animController);
     _color2 = ColorTween(
-      begin: const Color(0xFF1CB5E0),
-      end: const Color(0xFF000046),
+      begin: const Color(0xFF087B94),
+      end: const Color(0xFFA90303),
     ).animate(_animController);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -188,16 +188,19 @@ class _ClientHomeScreenState extends State<ClientHomeScreen>
                             children: [
                               Row(
                                 children: [
-                                  Icon(
-                                    Icons.travel_explore,
-                                    color: _isReelMode
-                                        ? Colors.white
-                                        : Palette.primary,
-                                    size: 28,
+                                  Hero(
+                                    tag: 'app_logo',
+                                    child: Image.asset(
+                                      'assets/images/logo_a.png',
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
+
                                   const SizedBox(width: 8),
                                   Text(
-                                    "Trivok",
+                                    "Đi khắp mọi miền",
                                     style: GoogleFonts.nunito(
                                       color: textColor,
                                       fontWeight: FontWeight.bold,
@@ -222,7 +225,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen>
                           ),
                           const SizedBox(height: 10),
                           Container(
-                            height: 45,
+                            height: 40,
                             decoration: BoxDecoration(
                               color: _isReelMode
                                   ? Colors.white.withOpacity(0.2)

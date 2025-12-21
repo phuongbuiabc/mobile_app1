@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Thêm import Firestore
 import '../../config/palette.dart';
 
-class TicketDetailScreen extends StatelessWidget {
+class TicketDetailScreen extends StatefulWidget {
   final String bookingId;
   final String tourName;
   final String status;
@@ -32,9 +33,79 @@ class TicketDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<TicketDetailScreen> createState() => _TicketDetailScreenState();
+}
+
+class _TicketDetailScreenState extends State<TicketDetailScreen> {
+  bool _isCancelling = false;
+
+  // HÀM XỬ LÝ HỦY VÉ
+  Future<void> _handleCancelBooking() async {
+    // 1. Hiện hộp thoại xác nhận
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Xác nhận hủy vé", style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text("Bạn có chắc chắn muốn hủy vé này không?\nHành động này không thể hoàn tác."),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Đóng", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text("Xác nhận Hủy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isCancelling = true);
+
+    try {
+      // 2. Gọi API cập nhật trạng thái lên Firestore
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(widget.bookingId)
+          .update({
+        'status': 'cancelled',
+        // Có thể thêm lý do hủy hoặc thời gian hủy nếu cần
+        'cancelledAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        // 3. Thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Đã hủy vé thành công!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Quay lại màn hình trước (Danh sách vé) để thấy trạng thái mới
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Lỗi khi hủy vé: $e"), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isCancelling = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(status);
-    final statusText = _getStatusText(status);
+    final statusColor = _getStatusColor(widget.status);
+    final statusText = _getStatusText(widget.status);
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -68,7 +139,7 @@ class TicketDetailScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(_getStatusIcon(status), color: statusColor, size: 20),
+                        Icon(_getStatusIcon(widget.status), color: statusColor, size: 20),
                         const SizedBox(width: 8),
                         Text(statusText.toUpperCase(), style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
                       ],
@@ -81,18 +152,17 @@ class TicketDetailScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tên Tour
-                        Text(tourName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.3), textAlign: TextAlign.center),
+                        Text(widget.tourName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.3), textAlign: TextAlign.center),
                         const SizedBox(height: 10),
-                        Center(child: Text("Mã vé: #${bookingId.substring(0, bookingId.length > 8 ? 8 : bookingId.length).toUpperCase()}", style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+                        Center(child: Text("Mã vé: #${widget.bookingId.substring(0, widget.bookingId.length > 8 ? 8 : widget.bookingId.length).toUpperCase()}", style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
 
-                        // SỬA LỖI TẠI ĐÂY: Xóa dashAttributes, dùng Divider thường
                         const Divider(height: 40, thickness: 1),
 
                         // Thông tin ngày giờ
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildInfoItem("Ngày khởi hành", DateFormat('dd/MM/yyyy').format(bookingDate)),
+                            _buildInfoItem("Ngày khởi hành", DateFormat('dd/MM/yyyy').format(widget.bookingDate)),
                             _buildInfoItem("Thời gian", "08:00 AM"), // Giả định giờ
                           ],
                         ),
@@ -100,8 +170,8 @@ class TicketDetailScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildInfoItem("Số lượng khách", "$guestCount người"),
-                            _buildInfoItem("Tổng thanh toán", "${NumberFormat('#,###').format(totalPrice)} đ", isHighlight: true),
+                            _buildInfoItem("Số lượng khách", "${widget.guestCount} người"),
+                            _buildInfoItem("Tổng thanh toán", "${NumberFormat('#,###').format(widget.totalPrice)} đ", isHighlight: true),
                           ],
                         ),
 
@@ -111,11 +181,11 @@ class TicketDetailScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12)),
-                          child: guestNames.isEmpty
+                          child: widget.guestNames.isEmpty
                               ? const Text("Chưa cập nhật danh sách khách", style: TextStyle(color: Colors.grey))
                               : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: guestNames.map((name) => Padding(
+                            children: widget.guestNames.map((name) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
                                 children: [
@@ -148,12 +218,12 @@ class TicketDetailScreen extends StatelessWidget {
                 children: [
                   const Text("Thông tin liên hệ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
-                  _buildContactRow(Icons.person_outline, "Người đặt", contactName),
-                  _buildContactRow(Icons.phone_outlined, "Số điện thoại", contactPhone),
-                  _buildContactRow(Icons.email_outlined, "Email", contactEmail),
-                  if (note.isNotEmpty) ...[
+                  _buildContactRow(Icons.person_outline, "Người đặt", widget.contactName),
+                  _buildContactRow(Icons.phone_outlined, "Số điện thoại", widget.contactPhone),
+                  _buildContactRow(Icons.email_outlined, "Email", widget.contactEmail),
+                  if (widget.note.isNotEmpty) ...[
                     const Divider(height: 24),
-                    _buildContactRow(Icons.note_alt_outlined, "Ghi chú", note),
+                    _buildContactRow(Icons.note_alt_outlined, "Ghi chú", widget.note),
                   ]
                 ],
               ),
@@ -161,23 +231,25 @@ class TicketDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // Nút hỗ trợ hoặc Hủy
-            if (status == 'pending')
+            // Nút Hủy (Chỉ hiện khi trạng thái là pending)
+            if (widget.status == 'pending')
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    // Logic hủy vé
-                  },
-                  icon: const Icon(Icons.cancel_outlined, color: Colors.red),
-                  label: const Text("Yêu cầu hủy vé", style: TextStyle(color: Colors.red)),
+                  onPressed: _isCancelling ? null : _handleCancelBooking, // Gắn hàm xử lý tại đây
+                  icon: _isCancelling
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
+                      : const Icon(Icons.cancel_outlined, color: Colors.red),
+                  label: Text(_isCancelling ? "Đang xử lý..." : "Yêu cầu hủy vé", style: const TextStyle(color: Colors.red)),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.red),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
+
+            const SizedBox(height: 30),
           ],
         ),
       ),
