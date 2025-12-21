@@ -51,5 +51,56 @@ class FirestoreService {
     }
   }
 
+  // 3. CẬP NHẬT Tour (Admin)
+  Future<String?> updateTour({
+    required String tourId,
+    required String title,
+    required double price,
+    required List<String> images,
+    required String description,
+    required String destination,
+    required List<String> itinerary,
+    double? rate,
+    bool? isActive,
+  }) async {
+    try {
+      if (images.isEmpty) {
+        return "Vui lòng cung cấp ít nhất 1 ảnh.";
+      }
+
+      final updates = <String, dynamic>{
+        'title': title,
+        'price': price,
+        'images': images,
+        'description': description,
+        'destination': destination,
+        'itinerary': itinerary,
+      };
+
+      if (rate != null) {
+        updates['rate'] = rate;
+      }
+      if (isActive != null) {
+        updates['is_active'] = isActive;
+      }
+
+      await _firestore.collection('tours').doc(tourId).update(updates);
+
+      return null; // Thành công
+    } catch (e) {
+      return 'Lỗi cập nhật tour: ${e.toString()}';
+    }
+  }
+
+  // 4. XÓA Tour (Admin)
+  Future<String?> deleteTour(String tourId) async {
+    try {
+      await _firestore.collection('tours').doc(tourId).delete();
+      return null; // Thành công
+    } catch (e) {
+      return 'Lỗi xóa tour: ${e.toString()}';
+    }
+  }
+
   String? get currentUserId => _auth.currentUser?.uid;
 }
