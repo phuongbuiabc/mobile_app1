@@ -169,7 +169,7 @@ class AdminTourListScreen extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '${_formatPrice(tour.price)} VNĐ',
+                      '${AdminTourListScreen.formatPrice(tour.price)} VNĐ',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -286,7 +286,7 @@ class AdminTourListScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildDetailRow('Tên Tour', tour.title),
                 _buildDetailRow('Điểm đến', tour.destination),
-                _buildDetailRow('Giá', '${_formatPrice(tour.price)} VNĐ'),
+                _buildDetailRow('Giá', '${AdminTourListScreen.formatPrice(tour.price)} VNĐ'),
                 _buildDetailRow('Đánh giá', '${tour.rate} ⭐'),
                 _buildDetailRow('Thời gian', tour.duration),
                 _buildDetailRow('Trạng thái', tour.isActive ? 'Hoạt động' : 'Tạm dừng'),
@@ -468,7 +468,9 @@ class AdminTourListScreen extends StatelessWidget {
     }
   }
 
-  String _formatPrice(double price) {
+  // Hàm format giá tiền, tách phần ngàn bằng dấu phẩy, ví dụ: 1234567 -> 1,234,567
+  // Để static để có thể dễ dàng viết unit test cho logic này
+  static String formatPrice(double price) {
     return price.toStringAsFixed(0).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]},',
