@@ -35,6 +35,11 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
       label: 'Số điện thoại',
       hint: 'Nhập số điện thoại của bạn',
     ),
+    _FieldDef(
+      key: 'avatar',
+      label: 'Link ảnh đại diện',
+      hint: 'Nhập link ảnh đại diện (tùy chọn)',
+    ),
   ];
 
   @override
@@ -116,6 +121,16 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
         // Nếu không có thì lấy từ Auth
         return user.phoneNumber ?? '';
 
+      case 'avatar':
+        // Lấy avatar từ Firestore
+        final avatarFromFirestore = _userData?['avatar'];
+        if (avatarFromFirestore != null &&
+            avatarFromFirestore.toString().isNotEmpty) {
+          return avatarFromFirestore.toString();
+        }
+        // Nếu không có thì để trống
+        return '';
+
       default:
         return '';
     }
@@ -147,8 +162,7 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
       // Xử lý Tên hiển thị
       final displayNameInput = _controllers['displayName']!.text.trim();
       // Logic kiểm tra thay đổi tên
-      // Lấy tên hiện tại (ưu tiên từ Firestore, fallback về Auth)
-      final currentDbName = _userData?['fullName']?.toString();
+      // Lấy tên hiện tại từ Auth
       final currentAuthName = user.displayName;
 
       // Nếu tên nhập vào khác tên trong DB hoặc (nếu DB chưa có thì khác Auth)
@@ -170,6 +184,19 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
       } else if (phoneInput.isEmpty && currentPhone.isNotEmpty) {
         // Nếu người dùng xóa sđt, xóa field đó trong firestore
         updates['phone'] = FieldValue.delete();
+      }
+
+      // Xử lý Avatar
+      final avatarInput = _controllers['avatar']!.text.trim();
+      final currentAvatar = _userData?['avatar']?.toString() ?? '';
+
+      if (avatarInput != currentAvatar) {
+        if (avatarInput.isNotEmpty) {
+          updates['avatar'] = avatarInput;
+        } else {
+          // Nếu người dùng xóa avatar, xóa field đó trong firestore
+          updates['avatar'] = FieldValue.delete();
+        }
       }
 
       if (updates.isNotEmpty) {
@@ -245,11 +272,15 @@ class _ChangeUserInfoScreenState extends State<ChangeUserInfoScreen> {
                           // Thêm prefix icon cho đẹp (tùy chọn)
                           prefixIcon: f.key == 'displayName'
                               ? const Icon(Icons.person)
-                              : const Icon(Icons.phone),
+                              : f.key == 'phone'
+                                  ? const Icon(Icons.phone)
+                                  : const Icon(Icons.image),
                         ),
                         keyboardType: f.key == 'phone'
                             ? TextInputType.phone
-                            : TextInputType.text,
+                            : f.key == 'avatar'
+                                ? TextInputType.url
+                                : TextInputType.text,
                         validator: (value) {
                           if (f.key == 'displayName') {
                             if (value == null || value.trim().isEmpty) {

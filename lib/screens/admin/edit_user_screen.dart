@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../config/palette.dart';
 import '../../services/user_admin_service.dart';
 
@@ -120,7 +121,13 @@ class _EditUserScreenState extends State<EditUserScreen> {
                 "Số điện thoại",
                 Icons.phone,
                 keyboardType: TextInputType.phone,
-                hintText: "Nhập số điện thoại (tùy chọn)",
+                hintText: "Nhập số điện thoại",
+                isRequired: true,
+                isPhone: true,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -225,10 +232,13 @@ class _EditUserScreenState extends State<EditUserScreen> {
     TextInputType keyboardType = TextInputType.text,
     String hintText = '',
     bool isRequired = false,
+    bool isPhone = false,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
@@ -241,11 +251,29 @@ class _EditUserScreenState extends State<EditUserScreen> {
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       ),
-      validator: isRequired
-          ? (val) => (val == null || val.trim().isEmpty)
-              ? "Vui lòng nhập $label"
-              : null
-          : null,
+      validator: (val) {
+        final value = val?.trim() ?? '';
+
+        if (isRequired && value.isEmpty) {
+          return "Vui lòng nhập $label";
+        }
+
+        if (isPhone && value.isNotEmpty) {
+          // Chỉ cho phép số, bắt đầu bằng 0 và đủ 10 ký tự
+          final numericRegex = RegExp(r'^\d+$');
+          if (!numericRegex.hasMatch(value)) {
+            return "Số điện thoại chỉ được chứa số";
+          }
+          if (value.length != 10) {
+            return "Số điện thoại phải có đúng 10 chữ số";
+          }
+          if (!value.startsWith('0')) {
+            return "Số điện thoại phải bắt đầu bằng số 0";
+          }
+        }
+
+        return null;
+      },
     );
   }
 }
