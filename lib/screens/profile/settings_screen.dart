@@ -16,7 +16,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _ticketStatusNotif = true;
   bool _promoNotif = true;
   bool _tripReminderNotif = false;
-  String _themeMode = 'Hệ thống';
+  String _themeMode = 'Sáng';
 
   @override
   Widget build(BuildContext context) {
@@ -160,24 +160,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               RadioListTile<String>(
                 title: const Text('Sáng'),
                 value: 'Sáng',
-                groupValue: _themeMode,
-                onChanged: (val) => setState(() {
-                  _themeMode = val!;
-                  Navigator.pop(context);
-                }),
-              ),
-              RadioListTile<String>(
-                title: const Text('Tối'),
-                value: 'Tối',
-                groupValue: _themeMode,
-                onChanged: (val) => setState(() {
-                  _themeMode = val!;
-                  Navigator.pop(context);
-                }),
-              ),
-              RadioListTile<String>(
-                title: const Text('Theo hệ thống'),
-                value: 'Hệ thống',
                 groupValue: _themeMode,
                 onChanged: (val) => setState(() {
                   _themeMode = val!;

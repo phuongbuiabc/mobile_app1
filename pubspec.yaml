@@ -46,7 +46,7 @@ dependencies:
   shimmer: ^3.0.0           # Hiệu ứng loading xương cá
 
   # 4. Tiện ích khác
-  intl: ^0.19.0             # Định dạng tiền tệ, ngày tháng
+  intl: ^0.20.2             # Định dạng tiền tệ, ngày tháng
   cached_network_image: ^3.3.0 # Load ảnh từ mạng mượt hơn
   google_sign_in: ^6.2.1  # Đăng nhập Google
   email_otp: ^2.1.2       # Gửi mã OTP về mail (Dễ dùng cho sinh viên)

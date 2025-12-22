@@ -14,9 +14,10 @@ class FavoritesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tour đã lưu", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text("Tour đã thích", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: StreamBuilder<List<TourModel>>(

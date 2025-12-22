@@ -25,14 +25,15 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _fetchUserData() async {
-    if (_currentUser == null) {
+    final user = _currentUser;
+    if (user == null) {
       if (mounted) setState(() => _isLoading = false);
       return;
     }
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(_currentUser!.uid)
+          .doc(user.uid)
           .get();
       if (doc.exists && mounted) {
         setState(() {
@@ -55,6 +56,22 @@ class _AccountScreenState extends State<AccountScreen> {
     final String email =
         _userData?['email'] ?? _currentUser?.email ?? 'Không có email';
     final String? avatarUrl = _userData?['avatar'] ?? _currentUser?.photoURL;
+
+    // Lấy số điện thoại: ưu tiên Firestore, sau đó Auth, cuối cùng là "Chưa cập nhật"
+    final String phone;
+    final phoneFromFirestore = _userData?['phone'];
+    if (phoneFromFirestore != null &&
+        phoneFromFirestore.toString().isNotEmpty) {
+      phone = phoneFromFirestore.toString();
+    } else {
+      final phoneFromAuth = _currentUser?.phoneNumber;
+      if (phoneFromAuth != null && phoneFromAuth.isNotEmpty) {
+        phone = phoneFromAuth;
+      } else {
+        phone = 'Chưa cập nhật số điện thoại';
+      }
+    }
+
     final String createAt;
     if (_userData?['createdAt'] != null) {
       final timestamp = _userData!['createdAt'] as Timestamp;
@@ -109,7 +126,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 _buildInfoTile(
                   icon: Icons.phone_outlined,
                   label: 'Số điện thoại',
-                  value: 'Chưa cập nhật', // Giả sử chưa có
+                  value: phone,
                 ),
                 const Divider(height: 30),
                 _buildInfoTile(
@@ -119,18 +136,22 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: () {
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //   const SnackBar(
-                    //     content: Text("Chức năng đang phát triển!"),
-                    //   ),
-                    // );
-                    Navigator.push(
+                  onPressed: () async {
+                    // 1. Thêm từ khóa 'await' để đợi màn hình ChangeUserInfoScreen trả về kết quả
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const ChangeUserInfoScreen(),
                       ),
                     );
+
+                    // 2. Kiểm tra kết quả. Nếu trả về true nghĩa là người dùng đã bấm "Lưu thay đổi"
+                    if (result == true) {
+                      _fetchUserData();
+                      if (context.mounted) {
+                        setState(() => _isLoading = false);
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.accent,
