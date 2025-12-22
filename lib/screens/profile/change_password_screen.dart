@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../config/palette.dart';
+import '../../utils/password_validator.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -107,15 +108,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               label: 'Mật khẩu mới',
               obscureText: _obscureNew,
               onToggle: () => setState(() => _obscureNew = !_obscureNew),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập mật khẩu mới.';
-                }
-                if (value.length < 6) {
-                  return 'Mật khẩu phải có ít nhất 6 ký tự.';
-                }
-                return null;
-              },
+              validator: (value) => PasswordValidator.validateNewPassword(value),
             ),
             const SizedBox(height: 16),
             _buildPasswordField(
@@ -124,12 +117,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               obscureText: _obscureConfirm,
               onToggle: () =>
                   setState(() => _obscureConfirm = !_obscureConfirm),
-              validator: (value) {
-                if (value != _newPasswordController.text) {
-                  return 'Mật khẩu xác nhận không khớp.';
-                }
-                return null;
-              },
+              validator: (value) => PasswordValidator.validateConfirmPassword(
+                value,
+                _newPasswordController.text,
+              ),
             ),
             const SizedBox(height: 40),
             SizedBox(
